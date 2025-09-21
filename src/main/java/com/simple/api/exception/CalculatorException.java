@@ -34,4 +34,15 @@ public class CalculatorException {
         );
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(ArithmeticException.class)
+    public ResponseEntity<CalculatorResponseDTO<Object>> handleIllegalArgument(ArithmeticException ex) {
+        CalculatorResponseDTO<Object> response = new CalculatorResponseDTO<>(
+            StatusLevelEnums.ERROR.getLevel(),
+            CalculatorResponseEnums.INVALID_OPERATION.getCode(),
+            CalculatorResponseEnums.INVALID_OPERATION.getMessage(),
+            null
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
 }
