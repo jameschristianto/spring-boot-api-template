@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "app.version",
+  "type": "java.lang.String",
+  "description": "The version of the Calculator API"
+}]}
