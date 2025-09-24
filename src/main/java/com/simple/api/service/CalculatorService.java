@@ -2,6 +2,8 @@ package com.simple.api.service;
 
 import com.simple.api.dto.CalculatorRequestDTO;
 import com.simple.api.entity.CalculatorEntity;
+import com.simple.api.enums.CalculatorResponseEnums;
+import com.simple.api.enums.CalculatorEnums;
 import com.simple.api.repository.CalculatorRepository;
 
 import java.time.LocalDateTime;
@@ -17,121 +19,62 @@ public class CalculatorService {
     public CalculatorService(CalculatorRepository calculatorRepository) {
         this.calculatorRepository = calculatorRepository;
     }
+
     public Integer add(CalculatorRequestDTO dto) {
-        Integer result = null;
-        try {
-            result = null;
-            result = dto.getValue1() + dto.getValue2();
-            saveLog(
-                "ADD",
-                dto.getValue1(),
-                dto.getValue2(),
-                result.toString(),
-                "SUCCESS"
-            );
-        } catch (Exception ex) {
-            saveLog(
-                "ADD",
-                dto.getValue1(),
-                dto.getValue2(),
-                null,
-                "FAILED"
-            );
-            throw ex;
-        }
-        return result;
+        return saveLog("ADD", dto.getValue1(), dto.getValue2());
     }
 
     public Integer subtract(CalculatorRequestDTO dto) {
-        Integer result = null;
-        try {
-            result = null;
-            result = dto.getValue1() - dto.getValue2();
-            saveLog(
-                "SUBTRACT",
-                dto.getValue1(),
-                dto.getValue2(),
-                result.toString(),
-                "SUCCESS"
-            );
-        } catch (Exception ex) {
-            saveLog(
-                "SUBTRACT",
-                dto.getValue1(),
-                dto.getValue2(),
-                null,
-                "FAILED"
-            );
-            throw ex;
-        }
-        return result;
+        return saveLog("SUBTRACT", dto.getValue1(), dto.getValue2());
     }
 
     public Integer multiply(CalculatorRequestDTO dto) {
-        Integer result = null;
-        try {
-            result = null;
-            result = dto.getValue1() * dto.getValue2();
-            saveLog(
-                "MULTIPLY",
-                dto.getValue1(),
-                dto.getValue2(),
-                result.toString(),
-                "SUCCESS"
-            );
-        } catch (Exception ex) {
-            saveLog(
-                "MULTIPLY",
-                dto.getValue1(),
-                dto.getValue2(),
-                null,
-                "FAILED"
-            );
-            throw ex;
-        }
-        return result;
+        return saveLog("MULTIPLY", dto.getValue1(), dto.getValue2());
     }
 
     public Integer divide(CalculatorRequestDTO dto) {
-        Integer result = null;
-        try {
-            result = null;
-            result = dto.getValue1() / dto.getValue2();
-            saveLog(
-                "DIVIDE",
-                dto.getValue1(),
-                dto.getValue2(),
-                result.toString(),
-                "SUCCESS"
-            );
-        } catch (Exception ex) {
-            saveLog(
-                "DIVIDE",
-                dto.getValue1(),
-                dto.getValue2(),
-                null,
-                "FAILED"
-            );
-            throw ex;
-        }
-        return result;
+        return saveLog("DIVIDE", dto.getValue1(), dto.getValue2());
     }
 
-    private void saveLog(String operation, Integer value1, Integer value2, String result, String status) {
-        String expression = switch (operation) {
-            case "ADD"      -> String.format("%d + %d", value1, value2);
-            case "SUBTRACT" -> String.format("%d - %d", value1, value2);
-            case "MULTIPLY" -> String.format("%d * %d", value1, value2);
-            case "DIVIDE"   -> String.format("%d / %d", value1, value2);
-            default         -> "NOT DEFINED";
-        };
+    private Integer saveLog(String operation, Integer value1, Integer value2) {
+        String expression = null;
+        Integer result = null;
 
-        CalculatorEntity log = new CalculatorEntity();
-        log.setRequestTimestamp(LocalDateTime.now());
-        log.setRequestOperation(expression);
-        log.setResult(result);
-        log.setStatus(status);
-        calculatorRepository.save(log);
+        try {
+            expression = switch (operation) {
+                case CalculatorEnums.ADD        -> String.format("%d + %d", value1, value2);
+                case CalculatorEnums.SUBTRACT   -> String.format("%d - %d", value1, value2);
+                case CalculatorEnums.MULTIPLY   -> String.format("%d * %d", value1, value2);
+                case CalculatorEnums.DIVIDE     -> String.format("%d / %d", value1, value2);
+                default                         -> null;
+            };
+
+            result = switch (operation) {
+                case CalculatorEnums.ADD        -> value1 + value2;
+                case CalculatorEnums.SUBTRACT   -> value1 - value2;
+                case CalculatorEnums.MULTIPLY   -> value1 * value2;
+                case CalculatorEnums.DIVIDE     -> value1 / value2;
+                default                         -> null;
+            };
+
+            CalculatorEntity log = new CalculatorEntity();
+            log.setRequestTimestamp(LocalDateTime.now());
+            log.setRequestOperation(expression);
+            log.setResult(result.toString());
+            log.setStatus(CalculatorEnums.SUCCESS.getMessage());
+            calculatorRepository.save(log);
+        } catch (Exception ex) {
+            CalculatorEntity log = new CalculatorEntity();
+            log.setRequestTimestamp(LocalDateTime.now());
+            log.setRequestOperation(expression);
+            log.setResult(null);
+            log.setStatus(CalculatorEnums.FAILED.getMessage());
+            calculatorRepository.save(log);
+
+            throw ex;
+        }
+
+        return result;
     }
 
     public List<CalculatorEntity> getHistory() {
