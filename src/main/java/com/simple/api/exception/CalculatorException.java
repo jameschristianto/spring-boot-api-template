@@ -1,5 +1,7 @@
 package com.simple.api.exception;
 
+import java.io.IOException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.simple.api.dto.CalculatorResponseDTO;
 import com.simple.api.enums.CalculatorResponseEnums;
 import com.simple.api.enums.StatusLevelEnums;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class CalculatorException {
@@ -36,7 +40,7 @@ public class CalculatorException {
     }
 
     @ExceptionHandler(ArithmeticException.class)
-    public ResponseEntity<CalculatorResponseDTO<Object>> handleIllegalArgument(ArithmeticException ex) {
+    public ResponseEntity<CalculatorResponseDTO<Object>> handleIllegalArgument(ArithmeticException ex, HttpServletRequest request) throws IOException {
         CalculatorResponseDTO<Object> response = new CalculatorResponseDTO<>(
             StatusLevelEnums.ERROR.getLevel(),
             CalculatorResponseEnums.INVALID_OPERATION.getCode(),

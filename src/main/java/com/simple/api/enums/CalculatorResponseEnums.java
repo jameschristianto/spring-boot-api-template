@@ -2,6 +2,7 @@ package com.simple.api.enums;
 
 public enum CalculatorResponseEnums {
     SUCCESS_CALCULATION("S001", "Calculation successful"),
+    SUCCESS_GET_INFO("S002", "Get info successful"),
     INVALID_INPUT_TYPE("E001", "Invalid input type: please provide numbers for integer fields"),
     VALUE_REQUIRED("E002", "Value must not be null"),
     INVALID_OPERATION("E003", "Invalid operation");

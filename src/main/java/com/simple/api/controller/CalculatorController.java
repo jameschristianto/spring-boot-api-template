@@ -1,5 +1,7 @@
 package com.simple.api.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import com.simple.api.dto.CalculatorResponseDTO;
 import com.simple.api.enums.CalculatorResponseEnums;
 import com.simple.api.enums.StatusLevelEnums;
 import com.simple.api.service.CalculatorService;
+import com.simple.api.entity.CalculatorEntity;
 
 import jakarta.validation.Valid;
 
@@ -27,9 +30,18 @@ public class CalculatorController {
     private CalculatorConfig calculatorConfig;
 
     @GetMapping(value = "/info")
-    public String version()
+    public ResponseEntity<CalculatorResponseDTO<String>> version()
     {
-        return calculatorConfig.getVersion();
+        String version = calculatorConfig.getVersion();
+
+        CalculatorResponseDTO<String> response = new CalculatorResponseDTO<>(
+            StatusLevelEnums.SUCCESS.getLevel(),
+            CalculatorResponseEnums.SUCCESS_GET_INFO.getCode(),
+            CalculatorResponseEnums.SUCCESS_GET_INFO.getMessage(),
+            version
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @Autowired
@@ -38,7 +50,7 @@ public class CalculatorController {
     @PostMapping("/addition")
     public ResponseEntity<CalculatorResponseDTO<Integer>> add(@Valid @RequestBody CalculatorRequestDTO calculatorDTO)
     {
-        Integer result = calculatorService.add(calculatorDTO.getValue1(), calculatorDTO.getValue2());
+        Integer result = calculatorService.add(calculatorDTO);
 
         CalculatorResponseDTO<Integer> response = new CalculatorResponseDTO<>(
             StatusLevelEnums.SUCCESS.getLevel(),
@@ -53,7 +65,7 @@ public class CalculatorController {
     @PostMapping("/subtract")
     public ResponseEntity<CalculatorResponseDTO<Integer>> subtract(@Valid @RequestBody CalculatorRequestDTO calculatorDTO)
     {
-        Integer result = calculatorService.subtract(calculatorDTO.getValue1(), calculatorDTO.getValue2());
+        Integer result = calculatorService.subtract(calculatorDTO);
 
         CalculatorResponseDTO<Integer> response = new CalculatorResponseDTO<>(
             StatusLevelEnums.SUCCESS.getLevel(),
@@ -68,7 +80,7 @@ public class CalculatorController {
     @PostMapping("/multiply")
     public ResponseEntity<CalculatorResponseDTO<Integer>> multiply(@Valid @RequestBody CalculatorRequestDTO calculatorDTO)
     {
-        Integer result = calculatorService.multiply(calculatorDTO.getValue1(), calculatorDTO.getValue2());
+        Integer result = calculatorService.multiply(calculatorDTO);
 
         CalculatorResponseDTO<Integer> response = new CalculatorResponseDTO<>(
             StatusLevelEnums.SUCCESS.getLevel(),
@@ -83,13 +95,27 @@ public class CalculatorController {
     @PostMapping("/divide")
     public ResponseEntity<CalculatorResponseDTO<Integer>> divide(@Valid @RequestBody CalculatorRequestDTO calculatorDTO)
     {
-        Integer result = calculatorService.divide(calculatorDTO.getValue1(), calculatorDTO.getValue2());
+        Integer result = calculatorService.divide(calculatorDTO);
 
         CalculatorResponseDTO<Integer> response = new CalculatorResponseDTO<>(
             StatusLevelEnums.SUCCESS.getLevel(),
             CalculatorResponseEnums.SUCCESS_CALCULATION.getCode(),
             CalculatorResponseEnums.SUCCESS_CALCULATION.getMessage(),
             result
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<CalculatorResponseDTO<List<CalculatorEntity>>> getHistory() {
+        List<CalculatorEntity> history = calculatorService.getHistory();
+        
+        CalculatorResponseDTO<List<CalculatorEntity>> response = new CalculatorResponseDTO<>(
+            StatusLevelEnums.SUCCESS.getLevel(),
+            CalculatorResponseEnums.SUCCESS_GET_INFO.getCode(),
+            CalculatorResponseEnums.SUCCESS_GET_INFO.getMessage(),
+            history
         );
 
         return ResponseEntity.ok(response);
